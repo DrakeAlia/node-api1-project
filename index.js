@@ -101,7 +101,7 @@ server.delete('/api/users/:id', (req, res) => {
 // When the client makes a `PUT` request to `/api/users/:id`:
 server.put('/api/users/:id', (req, res) => {
 	const id = req.params.id;
-	const filtered = users.filter((item) => item.id === id);
+	const filtered = users.filter((item) => item.id !== id);
 	const updateUser = req.body;
 
 	if (filtered.length === 0) {
