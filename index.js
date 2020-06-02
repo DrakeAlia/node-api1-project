@@ -31,13 +31,19 @@ server.post('/api/users', (req, res) => {
 	const userInfo = {
 		...req.body,
 		id: shortid.generate()
-	};
+    };
+    // If the request body is missing the `name` or `bio` property
+    // respond with HTTP status code `400` (Bad Request).
 	if (!userInfo.name || !userInfo.bio) {
 		res.status(400).json({ errorMessage: 'Please provide name and bio for the user.' });
 	} else {
-		users.push(userInfo);
+        users.push(userInfo);
+        // If the information about the _user_ is valid
+        // respond with HTTP status code `201` (Created).
 		if (users.includes(userInfo)) {
-			res.status(201).json(users);
+            res.status(201).json(users);
+            // If there's an error while saving the _user_:
+            // respond with HTTP status code `500` (Server Error).
 		} else {
 			res.status(500).json({ errorMessage: 'There was an error while saving the user to the database' });
 		}
@@ -46,6 +52,7 @@ server.post('/api/users', (req, res) => {
 
 // When the client makes a `GET` request to `/api/users`:
 server.get('/api/users', (req, res) => {
+    // If there's an error in retrieving the _users_ from the database:
 	if (users === null || users === undefined || users.length === 0) {
 		res.status(500).json({ errorMessage: 'The users information could not be retrieved.' });
 	} else {
@@ -60,8 +67,10 @@ server.get('/api/users/:id', (req, res) => {
 	let user = users.filter((item) => item.id === id);
 
 	if (user === null || user === undefined) {
+        //If there's an error in retrieving the _user_ from the database:
 		res.status(500).json({ errorMessage: 'The users information could not be retrieved.' });
 	} else if (user.length === 0) {
+        // If the _user_ with the specified `id` is not found:
 		res.status(404).json({ message: 'The user with the specified ID does not exist.' });
 	} else {
 		res.status(200).json(user);
@@ -83,6 +92,8 @@ server.delete('/api/users/:id', (req, res) => {
 		users = users.filter((item) => item !== user);
 		res.status(200).json(users);
 	} else {
+        // If the _user_ with the specified `id` is not found:
+        // respond with HTTP status code `404` (Not Found).
 		res.status(404).json({ message: 'The user with the specified ID does not exist.' });
 	}
 });
@@ -94,8 +105,10 @@ server.put('/api/users/:id', (req, res) => {
 	const updateUser = req.body;
 
 	if (filtered.length === 0) {
+       // If the _user_ with the specified `id` is not found:
 		res.status(404).json({ message: 'The user with the specified ID does not exist.' });
 	} else if (!updateUser.name || !updateUser.bio) {
+        // If the request body is missing the `name` or `bio` property:
 		res.status(400).json({ errorMessage: 'Please provide name and bio for the user.' });
 	} else if (updateUser.name && updateUser.bio) {
 		const updated = users.map((item) => {
@@ -109,9 +122,11 @@ server.put('/api/users/:id', (req, res) => {
 				return item;
 			}
 		});
-		users = updated;
+        users = updated;
+        // If the user is found and the new information is valid:
 		res.status(200).json(users);
 	} else {
+        // If there's an error when updating the _user_:
 		res.status(500).json({ errorMessage: 'The user information could not be modified.' });
 	}
 });
